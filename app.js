@@ -1,49 +1,55 @@
 const express = require("express");
 const app = express();
-const songs = require("./songs");
+const {
+  getAllSong,
+  getSortedSong,
+  createNewSong,
+  playSong,
+} = require("./songs");
 
 app.use(express.json());
 app.get("/", (req, res) => {
   try {
-    res.status(200);
-    res.send(songs);
+    res.redirect("/song");
   } catch (error) {}
 });
 
-app.get("/playSong/:id", (req, res) => {
-  try {
-    const id = req.params.id;
-    res.status(200);
-
-    songs.forEach((song) => {
-      song.status = "idle";
-    });
-
-    songs[id - 1].status = "playing";
-
-    res.send(songs);
-  } catch (error) {}
+// Song
+app.get("/song", (req, res) => {
+  res.send(getAllSong());
 });
 
-app.post("/addSong", (req, res) => {
+app.post("/song", (req, res) => {
   try {
     const newSong = req.body;
-
-    console.log("checkpoint 1", newSong);
-
-    newSong.status = "idle";
-    newSong.id = songs[songs.length - 1].id++;
-
-    console.log("checkpoint 2");
-
-    songs.push(newSong);
-
-    console.log("checkpoint 3");
+    createNewSong(newSong);
 
     res.statusCode = 201;
     res.json({ status: "success", message: "data added successfully" });
-    // res.redirect("/");
-  } catch (error) {}
+    res.redirect("/song");
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/song/:asc", (req, res) => {
+  try {
+    const isAsc = req.params.asc == 1 ? 1 : 0;
+    res.send(getSortedSong(isAsc));
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get("/play/:id", (req, res) => {
+  try {
+    const id = req.params.id;
+
+    res.status(200);
+    res.send(playSong(id));
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.listen(3000, () => {
