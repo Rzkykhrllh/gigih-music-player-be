@@ -104,6 +104,7 @@ const getSortedSong = (isAsc) => {
 const createNewSong = (newSong) => {
   newSong.status = "idle";
   newSong.id = songs[songs.length - 1].id++;
+  newSong.playedCount = 0;
 
   songs.push(newSong);
 };
